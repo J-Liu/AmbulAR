@@ -1,9 +1,5 @@
-//
-//  AppDelegate.swift
-//  AmbulAR
-//
-//  Created by Jia Liu on 9/28/26.
-//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2026 Jia Liu
 
 import UIKit
 
@@ -33,4 +29,3 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
 }
-
