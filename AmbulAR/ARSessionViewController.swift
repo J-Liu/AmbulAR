@@ -3,16 +3,20 @@
 
 import UIKit
 import ARKit
+import simd
 
 class ARSessionViewController: UIViewController {
 
     private let arView = ARSCNView()
     private let configuration = ARWorldTrackingConfiguration()
     private let sessionController = SessionController()
+    private let anchorManager = AnchorManager()
 
     private let actionButton = UIButton(type: .system)
     private let finishButton = UIButton(type: .system)
     private let distanceLabel = UILabel()
+
+    private var currentPosition: simd_float3?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -86,13 +90,38 @@ class ARSessionViewController: UIViewController {
     }
 
     @objc private func handleAction() {
+        let previousState = sessionController.state
         sessionController.handleAction()
+        handleAnchorCreation(previousState: previousState)
         updateUI()
     }
 
     @objc private func handleFinish() {
         sessionController.finish()
+        if let position = currentPosition {
+            anchorManager.createAnchor(at: position, type: .finish, in: arView.session)
+            anchorManager.attachMarkers(to: view)
+        }
         updateUI()
+    }
+
+    private func handleAnchorCreation(previousState: TrackingState) {
+        guard let position = currentPosition else { return }
+
+        switch (previousState, sessionController.state) {
+        case (.idle, .tracking):
+            anchorManager.createAnchor(at: position, type: .start, in: arView.session)
+        case (.tracking, .paused):
+            anchorManager.createAnchor(at: position, type: .pause, in: arView.session)
+        case (.paused, .tracking):
+            anchorManager.createAnchor(at: position, type: .resume, in: arView.session)
+        case (.finished, .idle):
+            anchorManager.clearAll()
+        default:
+            break
+        }
+
+        anchorManager.attachMarkers(to: view)
     }
 
     private func updateUI() {
@@ -126,6 +155,7 @@ extension ARSessionViewController: ARSessionDelegate {
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
         let cameraPosition = frame.camera.transform.columns.3
         let position = simd_float3(cameraPosition.x, cameraPosition.y, cameraPosition.z)
+        currentPosition = position
 
         if sessionController.state == .tracking {
             sessionController.update(with: position)
@@ -137,5 +167,7 @@ extension ARSessionViewController: ARSessionDelegate {
 
         let distance = sessionController.totalDistance
         distanceLabel.text = String(format: "%.3f m", distance)
+
+        anchorManager.updateMarkerPositions(for: frame, in: view)
     }
 }
