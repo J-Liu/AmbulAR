@@ -8,6 +8,7 @@ class ARSessionViewController: UIViewController {
 
     private let arView = ARSCNView()
     private let configuration = ARWorldTrackingConfiguration()
+    private let distanceTracker = DistanceTracker()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,9 +41,9 @@ class ARSessionViewController: UIViewController {
 extension ARSessionViewController: ARSessionDelegate {
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
         let cameraPosition = frame.camera.transform.columns.3
-        let x = cameraPosition.x
-        let y = cameraPosition.y
-        let z = cameraPosition.z
-        print("Camera position: x=\(String(format: "%.3f", x)), y=\(String(format: "%.3f", y)), z=\(String(format: "%.3f", z))")
+        let position = simd_float3(cameraPosition.x, cameraPosition.y, cameraPosition.z)
+        distanceTracker.update(with: position)
+        let distance = distanceTracker.currentDistance
+        print("Accumulated distance: \(String(format: "%.3f", distance)) m")
     }
 }
