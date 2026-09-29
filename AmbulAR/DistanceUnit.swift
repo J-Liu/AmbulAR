@@ -16,6 +16,14 @@ enum DistanceUnit: String, CaseIterable {
         }
     }
 
+    var localizedName: String {
+        switch self {
+        case .meters: return NSLocalizedString("Meters", comment: "")
+        case .kilometers: return NSLocalizedString("Kilometers", comment: "")
+        case .feet: return NSLocalizedString("Feet", comment: "")
+        }
+    }
+
     func format(_ meters: Float) -> String {
         switch self {
         case .meters:

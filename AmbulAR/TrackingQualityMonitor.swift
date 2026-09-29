@@ -17,18 +17,18 @@ extension TrackingQuality {
         case .limited(let reason):
             switch reason {
             case .excessiveMotion:
-                return "Moving too fast. Tracking quality reduced."
+                return NSLocalizedString("Moving too fast. Tracking quality reduced.", comment: "")
             case .insufficientFeatures:
-                return "Low visual features. Tracking quality reduced."
+                return NSLocalizedString("Low visual features. Tracking quality reduced.", comment: "")
             case .relocalizing:
-                return "Recovering tracking. Please wait."
+                return NSLocalizedString("Recovering tracking. Please wait.", comment: "")
             case .initializing:
-                return "Initializing tracking. Please wait."
+                return NSLocalizedString("Initializing tracking. Please wait.", comment: "")
             @unknown default:
-                return "Tracking quality reduced."
+                return NSLocalizedString("Tracking quality reduced.", comment: "")
             }
         case .notAvailable:
-            return "Tracking lost. Please restart session."
+            return NSLocalizedString("Tracking lost. Please restart session.", comment: "")
         }
     }
 

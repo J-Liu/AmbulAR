@@ -14,9 +14,10 @@ class ARSessionViewController: UIViewController {
 
     private let actionButton = UIButton(type: .system)
     private let finishButton = UIButton(type: .system)
+    private let settingsButton = UIButton(type: .system)
     private let distanceLabel = UILabel()
     private let qualityLabel = UILabel()
-    private let unitSegmentedControl = UISegmentedControl(items: DistanceUnit.allCases.map { $0.title })
+    private var unitSegmentedControl: UISegmentedControl!
 
     private var currentPosition: simd_float3?
     private var currentUnit: DistanceUnit = .meters
@@ -27,6 +28,7 @@ class ARSessionViewController: UIViewController {
         setupConfiguration()
         setupUI()
         setupQualityCallback()
+        setupLanguageObserver()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -51,6 +53,8 @@ class ARSessionViewController: UIViewController {
     }
 
     private func setupUI() {
+        unitSegmentedControl = UISegmentedControl(items: DistanceUnit.allCases.map { $0.localizedName })
+
         distanceLabel.font = .monospacedDigitSystemFont(ofSize: 36, weight: .medium)
         distanceLabel.textColor = .white
         distanceLabel.textAlignment = .center
@@ -59,7 +63,7 @@ class ARSessionViewController: UIViewController {
         view.addSubview(distanceLabel)
 
         actionButton.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
-        actionButton.setTitle("Start", for: .normal)
+        actionButton.setTitle(NSLocalizedString("Start", comment: ""), for: .normal)
         actionButton.backgroundColor = .systemBlue
         actionButton.setTitleColor(.white, for: .normal)
         actionButton.layer.cornerRadius = 12
@@ -68,7 +72,20 @@ class ARSessionViewController: UIViewController {
         view.addSubview(actionButton)
 
         finishButton.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
-        finishButton.setTitle("Finish", for: .normal)
+        finishButton.setTitle(NSLocalizedString("Finish", comment: ""), for: .normal)
+        finishButton.backgroundColor = .systemRed
+        finishButton.setTitleColor(.white, for: .normal)
+        finishButton.layer.cornerRadius = 12
+        finishButton.addTarget(self, action: #selector(handleFinish), for: .touchUpInside)
+        finishButton.translatesAutoresizingMaskIntoConstraints = false
+        finishButton.isHidden = true
+        view.addSubview(finishButton)
+
+        settingsButton.setImage(UIImage(systemName: "gear"), for: .normal)
+        settingsButton.tintColor = .white
+        settingsButton.addTarget(self, action: #selector(showSettings), for: .touchUpInside)
+        settingsButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(settingsButton)
         finishButton.backgroundColor = .systemRed
         finishButton.setTitleColor(.white, for: .normal)
         finishButton.layer.cornerRadius = 12
@@ -103,6 +120,11 @@ class ARSessionViewController: UIViewController {
             unitSegmentedControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             unitSegmentedControl.widthAnchor.constraint(equalToConstant: 240),
 
+            settingsButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            settingsButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            settingsButton.widthAnchor.constraint(equalToConstant: 44),
+            settingsButton.heightAnchor.constraint(equalToConstant: 44),
+
             actionButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             actionButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -30),
             actionButton.widthAnchor.constraint(equalToConstant: 120),
@@ -113,6 +135,31 @@ class ARSessionViewController: UIViewController {
             finishButton.widthAnchor.constraint(equalToConstant: 100),
             finishButton.heightAnchor.constraint(equalToConstant: 50)
         ])
+    }
+
+    private func setupLanguageObserver() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(updateLocalizedStrings),
+            name: LanguageManager.languageChangedNotification,
+            object: nil
+        )
+    }
+
+    @objc private func updateLocalizedStrings() {
+        unitSegmentedControl.removeAllSegments()
+        for (index, unit) in DistanceUnit.allCases.enumerated() {
+            unitSegmentedControl.insertSegment(withTitle: unit.localizedName, at: index, animated: false)
+        }
+        unitSegmentedControl.selectedSegmentIndex = DistanceUnit.allCases.firstIndex(of: currentUnit) ?? 0
+        updateUI()
+    }
+
+    @objc private func showSettings() {
+        let settingsVC = SettingsViewController()
+        let navController = UINavigationController(rootViewController: settingsVC)
+        navController.modalPresentationStyle = .formSheet
+        present(navController, animated: true)
     }
 
     private func setupQualityCallback() {
@@ -182,22 +229,22 @@ class ARSessionViewController: UIViewController {
         let state = sessionController.state
         switch state {
         case .idle:
-            actionButton.setTitle("Start", for: .normal)
+            actionButton.setTitle(NSLocalizedString("Start", comment: ""), for: .normal)
             actionButton.backgroundColor = .systemBlue
             actionButton.isHidden = false
             finishButton.isHidden = true
         case .tracking:
-            actionButton.setTitle("Pause", for: .normal)
+            actionButton.setTitle(NSLocalizedString("Pause", comment: ""), for: .normal)
             actionButton.backgroundColor = .systemOrange
             actionButton.isHidden = false
             finishButton.isHidden = false
         case .paused:
-            actionButton.setTitle("Continue", for: .normal)
+            actionButton.setTitle(NSLocalizedString("Continue", comment: ""), for: .normal)
             actionButton.backgroundColor = .systemGreen
             actionButton.isHidden = false
             finishButton.isHidden = false
         case .finished:
-            actionButton.setTitle("Reset", for: .normal)
+            actionButton.setTitle(NSLocalizedString("Reset", comment: ""), for: .normal)
             actionButton.backgroundColor = .systemBlue
             actionButton.isHidden = false
             finishButton.isHidden = true

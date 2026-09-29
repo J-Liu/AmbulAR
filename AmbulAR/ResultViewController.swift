@@ -9,7 +9,7 @@ final class ResultViewController: UIViewController {
     var unit: DistanceUnit = .meters
 
     private let distanceLabel = UILabel()
-    private let unitSegmentedControl = UISegmentedControl(items: DistanceUnit.allCases.map { $0.title })
+    private var unitSegmentedControl: UISegmentedControl!
     private let doneButton = UIButton(type: .system)
     private let stackView = UIStackView()
 
@@ -22,6 +22,9 @@ final class ResultViewController: UIViewController {
     private func setupView() {
         view.backgroundColor = .systemBackground
 
+        unitSegmentedControl = UISegmentedControl(items: DistanceUnit.allCases.map { $0.localizedName })
+        unitSegmentedControl.selectedSegmentIndex = DistanceUnit.allCases.firstIndex(of: unit) ?? 0
+
         stackView.axis = .vertical
         stackView.spacing = 24
         stackView.alignment = .center
@@ -30,7 +33,7 @@ final class ResultViewController: UIViewController {
 
         let titleLabel = UILabel()
         titleLabel.font = .systemFont(ofSize: 28, weight: .bold)
-        titleLabel.text = "Tracking Complete"
+        titleLabel.text = NSLocalizedString("Tracking Complete", comment: "")
         titleLabel.textAlignment = .center
         stackView.addArrangedSubview(titleLabel)
 
@@ -40,15 +43,14 @@ final class ResultViewController: UIViewController {
 
         let unitLabel = UILabel()
         unitLabel.font = .systemFont(ofSize: 16, weight: .medium)
-        unitLabel.text = "Display Unit"
+        unitLabel.text = NSLocalizedString("Display Unit", comment: "")
         stackView.addArrangedSubview(unitLabel)
 
-        unitSegmentedControl.selectedSegmentIndex = 0
         unitSegmentedControl.addTarget(self, action: #selector(unitChanged), for: .valueChanged)
         stackView.addArrangedSubview(unitSegmentedControl)
 
         doneButton.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
-        doneButton.setTitle("Done", for: .normal)
+        doneButton.setTitle(NSLocalizedString("Done", comment: ""), for: .normal)
         doneButton.backgroundColor = .systemBlue
         doneButton.setTitleColor(.white, for: .normal)
         doneButton.layer.cornerRadius = 12

@@ -52,10 +52,10 @@ final class MarkerView: UIView {
 extension MarkerType {
     var label: String {
         switch self {
-        case .start: return "Start"
-        case .pause: return "Pause"
-        case .resume: return "Resume"
-        case .finish: return "Finish"
+        case .start: return NSLocalizedString("Start Point", comment: "")
+        case .pause: return NSLocalizedString("Pause Point", comment: "")
+        case .resume: return NSLocalizedString("Resume Point", comment: "")
+        case .finish: return NSLocalizedString("Finish Point", comment: "")
         }
     }
 }
