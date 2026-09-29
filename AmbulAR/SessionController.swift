@@ -8,10 +8,17 @@ final class SessionController {
 
     var state: TrackingState = .idle
     var totalDistance: Float { sensorFusion.fusedDistance }
+    var currentTrackingQuality: TrackingQuality { qualityMonitor.currentQuality }
 
     private let distanceTracker = DistanceTracker()
     private let sensorFusion = SensorFusion()
+    private let qualityMonitor = TrackingQualityMonitor()
     private var pausedPosition: simd_float3?
+
+    var onQualityChange: ((TrackingQuality) -> Void)? {
+        get { qualityMonitor.onQualityChange }
+        set { qualityMonitor.onQualityChange = newValue }
+    }
 
     func startTracking() {
         sensorFusion.start()
@@ -28,6 +35,7 @@ final class SessionController {
             distanceTracker.reset()
             sensorFusion.reset()
             sensorFusion.start()
+            qualityMonitor.reset()
         case .tracking:
             state = .paused
         case .paused:
@@ -36,6 +44,7 @@ final class SessionController {
             state = .idle
             distanceTracker.reset()
             sensorFusion.reset()
+            qualityMonitor.reset()
         }
     }
 
@@ -46,6 +55,12 @@ final class SessionController {
 
     func update(with position: simd_float3, trackingState: ARCamera.TrackingState) {
         guard state == .tracking else { return }
+
+        let quality = qualityMonitor.evaluate(trackingState: trackingState)
+
+        if quality.shouldPause {
+            return
+        }
 
         if pausedPosition != nil {
             distanceTracker.reset()

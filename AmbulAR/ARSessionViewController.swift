@@ -15,6 +15,7 @@ class ARSessionViewController: UIViewController {
     private let actionButton = UIButton(type: .system)
     private let finishButton = UIButton(type: .system)
     private let distanceLabel = UILabel()
+    private let qualityLabel = UILabel()
 
     private var currentPosition: simd_float3?
 
@@ -23,6 +24,7 @@ class ARSessionViewController: UIViewController {
         setupARView()
         setupConfiguration()
         setupUI()
+        setupQualityCallback()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -73,9 +75,21 @@ class ARSessionViewController: UIViewController {
         finishButton.isHidden = true
         view.addSubview(finishButton)
 
+        qualityLabel.font = .systemFont(ofSize: 14, weight: .medium)
+        qualityLabel.textColor = .systemYellow
+        qualityLabel.textAlignment = .center
+        qualityLabel.numberOfLines = 0
+        qualityLabel.translatesAutoresizingMaskIntoConstraints = false
+        qualityLabel.isHidden = true
+        view.addSubview(qualityLabel)
+
         NSLayoutConstraint.activate([
             distanceLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             distanceLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+
+            qualityLabel.topAnchor.constraint(equalTo: distanceLabel.bottomAnchor, constant: 8),
+            qualityLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            qualityLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
 
             actionButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             actionButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -30),
@@ -87,6 +101,21 @@ class ARSessionViewController: UIViewController {
             finishButton.widthAnchor.constraint(equalToConstant: 100),
             finishButton.heightAnchor.constraint(equalToConstant: 50)
         ])
+    }
+
+    private func setupQualityCallback() {
+        sessionController.onQualityChange = { [weak self] quality in
+            self?.updateQualityLabel(quality)
+        }
+    }
+
+    private func updateQualityLabel(_ quality: TrackingQuality) {
+        if let message = quality.message {
+            qualityLabel.text = message
+            qualityLabel.isHidden = false
+        } else {
+            qualityLabel.isHidden = true
+        }
     }
 
     @objc private func handleAction() {
