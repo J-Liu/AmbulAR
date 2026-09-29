@@ -16,8 +16,10 @@ class ARSessionViewController: UIViewController {
     private let finishButton = UIButton(type: .system)
     private let distanceLabel = UILabel()
     private let qualityLabel = UILabel()
+    private let unitSegmentedControl = UISegmentedControl(items: DistanceUnit.allCases.map { $0.title })
 
     private var currentPosition: simd_float3?
+    private var currentUnit: DistanceUnit = .meters
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -83,6 +85,12 @@ class ARSessionViewController: UIViewController {
         qualityLabel.isHidden = true
         view.addSubview(qualityLabel)
 
+        unitSegmentedControl.selectedSegmentIndex = 0
+        unitSegmentedControl.backgroundColor = .systemGray5
+        unitSegmentedControl.addTarget(self, action: #selector(unitChanged), for: .valueChanged)
+        unitSegmentedControl.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(unitSegmentedControl)
+
         NSLayoutConstraint.activate([
             distanceLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             distanceLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -90,6 +98,10 @@ class ARSessionViewController: UIViewController {
             qualityLabel.topAnchor.constraint(equalTo: distanceLabel.bottomAnchor, constant: 8),
             qualityLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             qualityLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+
+            unitSegmentedControl.topAnchor.constraint(equalTo: qualityLabel.bottomAnchor, constant: 12),
+            unitSegmentedControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            unitSegmentedControl.widthAnchor.constraint(equalToConstant: 240),
 
             actionButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             actionButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -30),
@@ -131,7 +143,20 @@ class ARSessionViewController: UIViewController {
             anchorManager.createAnchor(at: position, type: .finish, in: arView.session)
             anchorManager.attachMarkers(to: view)
         }
+        showResult()
         updateUI()
+    }
+
+    @objc private func unitChanged() {
+        currentUnit = DistanceUnit.allCases[unitSegmentedControl.selectedSegmentIndex]
+    }
+
+    private func showResult() {
+        let resultVC = ResultViewController()
+        resultVC.totalDistance = sessionController.totalDistance
+        resultVC.unit = currentUnit
+        resultVC.modalPresentationStyle = .fullScreen
+        present(resultVC, animated: true)
     }
 
     private func handleAnchorCreation(previousState: TrackingState) {
@@ -195,7 +220,7 @@ extension ARSessionViewController: ARSessionDelegate {
         }
 
         let distance = sessionController.totalDistance
-        distanceLabel.text = String(format: "%.3f m", distance)
+        distanceLabel.text = currentUnit.format(distance)
 
         anchorManager.updateMarkerPositions(for: frame, in: view)
     }
