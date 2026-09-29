@@ -158,7 +158,7 @@ extension ARSessionViewController: ARSessionDelegate {
         currentPosition = position
 
         if sessionController.state == .tracking {
-            sessionController.update(with: position)
+            sessionController.update(with: position, trackingState: frame.camera.trackingState)
         }
 
         if sessionController.state == .paused {
