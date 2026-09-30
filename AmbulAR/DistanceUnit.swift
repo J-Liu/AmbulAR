@@ -7,12 +7,14 @@ enum DistanceUnit: String, CaseIterable {
     case meters = "m"
     case kilometers = "km"
     case feet = "ft"
+    case miles = "mi"
 
     var title: String {
         switch self {
         case .meters: return "Meters"
         case .kilometers: return "Kilometers"
         case .feet: return "Feet"
+        case .miles: return "Miles"
         }
     }
 
@@ -21,6 +23,7 @@ enum DistanceUnit: String, CaseIterable {
         case .meters: return NSLocalizedString("Meters", comment: "")
         case .kilometers: return NSLocalizedString("Kilometers", comment: "")
         case .feet: return NSLocalizedString("Feet", comment: "")
+        case .miles: return NSLocalizedString("Miles", comment: "")
         }
     }
 
@@ -32,6 +35,16 @@ enum DistanceUnit: String, CaseIterable {
             return String(format: "%.3f km", meters / 1000)
         case .feet:
             return String(format: "%.1f ft", meters * 3.28084)
+        case .miles:
+            return String(format: "%.3f mi", meters / 1609.344)
         }
+    }
+
+    static var current: DistanceUnit {
+        if let saved = UserDefaults.standard.string(forKey: "SelectedUnit"),
+           let unit = DistanceUnit(rawValue: saved) {
+            return unit
+        }
+        return .meters
     }
 }

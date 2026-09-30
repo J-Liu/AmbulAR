@@ -17,10 +17,8 @@ class ARSessionViewController: UIViewController {
     private let settingsButton = UIButton(type: .system)
     private let distanceLabel = UILabel()
     private let qualityLabel = UILabel()
-    private var unitSegmentedControl: UISegmentedControl!
 
     private var currentPosition: simd_float3?
-    private var currentUnit: DistanceUnit = .meters
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,7 +26,7 @@ class ARSessionViewController: UIViewController {
         setupConfiguration()
         setupUI()
         setupQualityCallback()
-        setupLanguageObserver()
+        setupObservers()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -53,8 +51,6 @@ class ARSessionViewController: UIViewController {
     }
 
     private func setupUI() {
-        unitSegmentedControl = UISegmentedControl(items: DistanceUnit.allCases.map { $0.localizedName })
-
         distanceLabel.font = .monospacedDigitSystemFont(ofSize: 36, weight: .medium)
         distanceLabel.textColor = .white
         distanceLabel.textAlignment = .center
@@ -86,13 +82,6 @@ class ARSessionViewController: UIViewController {
         settingsButton.addTarget(self, action: #selector(showSettings), for: .touchUpInside)
         settingsButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(settingsButton)
-        finishButton.backgroundColor = .systemRed
-        finishButton.setTitleColor(.white, for: .normal)
-        finishButton.layer.cornerRadius = 12
-        finishButton.addTarget(self, action: #selector(handleFinish), for: .touchUpInside)
-        finishButton.translatesAutoresizingMaskIntoConstraints = false
-        finishButton.isHidden = true
-        view.addSubview(finishButton)
 
         qualityLabel.font = .systemFont(ofSize: 14, weight: .medium)
         qualityLabel.textColor = .systemYellow
@@ -102,12 +91,6 @@ class ARSessionViewController: UIViewController {
         qualityLabel.isHidden = true
         view.addSubview(qualityLabel)
 
-        unitSegmentedControl.selectedSegmentIndex = 0
-        unitSegmentedControl.backgroundColor = .systemGray5
-        unitSegmentedControl.addTarget(self, action: #selector(unitChanged), for: .valueChanged)
-        unitSegmentedControl.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(unitSegmentedControl)
-
         NSLayoutConstraint.activate([
             distanceLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             distanceLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -115,10 +98,6 @@ class ARSessionViewController: UIViewController {
             qualityLabel.topAnchor.constraint(equalTo: distanceLabel.bottomAnchor, constant: 8),
             qualityLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             qualityLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-
-            unitSegmentedControl.topAnchor.constraint(equalTo: qualityLabel.bottomAnchor, constant: 12),
-            unitSegmentedControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            unitSegmentedControl.widthAnchor.constraint(equalToConstant: 240),
 
             settingsButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             settingsButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
@@ -137,22 +116,27 @@ class ARSessionViewController: UIViewController {
         ])
     }
 
-    private func setupLanguageObserver() {
+    private func setupObservers() {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(updateLocalizedStrings),
             name: LanguageManager.languageChangedNotification,
             object: nil
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(unitChanged),
+            name: .unitChanged,
+            object: nil
+        )
     }
 
     @objc private func updateLocalizedStrings() {
-        unitSegmentedControl.removeAllSegments()
-        for (index, unit) in DistanceUnit.allCases.enumerated() {
-            unitSegmentedControl.insertSegment(withTitle: unit.localizedName, at: index, animated: false)
-        }
-        unitSegmentedControl.selectedSegmentIndex = DistanceUnit.allCases.firstIndex(of: currentUnit) ?? 0
         updateUI()
+    }
+
+    @objc private func unitChanged() {
+        updateDistanceDisplay()
     }
 
     @objc private func showSettings() {
@@ -194,14 +178,10 @@ class ARSessionViewController: UIViewController {
         updateUI()
     }
 
-    @objc private func unitChanged() {
-        currentUnit = DistanceUnit.allCases[unitSegmentedControl.selectedSegmentIndex]
-    }
-
     private func showResult() {
         let resultVC = ResultViewController()
         resultVC.totalDistance = sessionController.totalDistance
-        resultVC.unit = currentUnit
+        resultVC.unit = DistanceUnit.current
         resultVC.modalPresentationStyle = .fullScreen
         present(resultVC, animated: true)
     }
@@ -250,6 +230,11 @@ class ARSessionViewController: UIViewController {
             finishButton.isHidden = true
         }
     }
+
+    private func updateDistanceDisplay() {
+        let distance = sessionController.totalDistance
+        distanceLabel.text = DistanceUnit.current.format(distance)
+    }
 }
 
 extension ARSessionViewController: ARSessionDelegate {
@@ -266,8 +251,7 @@ extension ARSessionViewController: ARSessionDelegate {
             sessionController.setPausedPosition(position)
         }
 
-        let distance = sessionController.totalDistance
-        distanceLabel.text = currentUnit.format(distance)
+        updateDistanceDisplay()
 
         anchorManager.updateMarkerPositions(for: frame, in: view)
     }

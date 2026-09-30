@@ -12,6 +12,7 @@
 "Meters" = "公尺";
 "Kilometers" = "公里";
 "Feet" = "英尺";
+"Miles" = "英里";
 
 /* Result Screen */
 "Tracking Complete" = "追蹤完成";
@@ -39,7 +40,3 @@
 "Simplified Chinese" = "簡體中文";
 "Traditional Chinese" = "繁體中文";
 "Language changed. Restart the app to apply." = "語言已更改，重啟應用程式以生效。";
-
-/* Permissions */
-"AmbulAR needs camera access to track your movement in augmented reality." = "AmbulAR 需要相機權限來在擴增實境中追蹤您的移動。";
-"AmbulAR needs motion data to improve distance tracking accuracy." = "AmbulAR 需要運動數據來提高距離追蹤精度。";
