@@ -6,20 +6,26 @@ import simd
 
 final class AnchorManager {
 
-    private(set) var anchors: [(anchor: ARAnchor, type: MarkerType, view: MarkerView)] = []
+    private(set) var anchors: [(anchor: ARAnchor, type: MarkerType, view: MarkerView, position: simd_float3)] = []
 
     @discardableResult
     func createAnchor(at position: simd_float3, type: MarkerType, in session: ARSession) -> ARAnchor {
-        let anchor = ARAnchor(transform: matrix_identity_float4x4)
+        var transform = matrix_identity_float4x4
+        transform.columns.3 = simd_float4(position.x, position.y, position.z, 1)
+
+        let anchor = ARAnchor(transform: transform)
         session.add(anchor: anchor)
         let view = MarkerView()
         view.markerType = type
-        anchors.append((anchor, type, view))
+        anchors.append((anchor, type, view, position))
+
+        print("[AnchorManager] Created \(type) anchor at position: (\(String(format: "%.3f", position.x)), \(String(format: "%.3f", position.y)), \(String(format: "%.3f", position.z)))")
+
         return anchor
     }
 
     func updateMarkerPositions(for frame: ARFrame, in view: UIView) {
-        for (anchor, _, markerView) in anchors {
+        for (anchor, _, markerView, _) in anchors {
             let worldPosition = simd_float3(
                 anchor.transform.columns.3.x,
                 anchor.transform.columns.3.y,
@@ -34,6 +40,7 @@ final class AnchorManager {
 
             let cameraPosition = frame.camera.transform.columns.3
             let toAnchor = worldPosition - simd_float3(cameraPosition.x, cameraPosition.y, cameraPosition.z)
+            let distance = length(toAnchor)
 
             let isInFront = toAnchor.z > 0
             let isInBounds = view.bounds.contains(CGPoint(x: projectedPoint.x, y: projectedPoint.y))
@@ -41,6 +48,7 @@ final class AnchorManager {
             if isInFront && isInBounds {
                 markerView.center = CGPoint(x: projectedPoint.x, y: projectedPoint.y)
                 markerView.isHidden = false
+                markerView.debugText = "\(String(format: "%.1f", distance))m"
             } else {
                 markerView.isHidden = true
             }
@@ -48,7 +56,7 @@ final class AnchorManager {
     }
 
     func attachMarkers(to view: UIView) {
-        for (_, _, markerView) in anchors {
+        for (_, _, markerView, _) in anchors {
             if markerView.superview == nil {
                 view.addSubview(markerView)
             }
@@ -56,7 +64,7 @@ final class AnchorManager {
     }
 
     func clearAll() {
-        for (_, _, markerView) in anchors {
+        for (_, _, markerView, _) in anchors {
             markerView.removeFromSuperview()
         }
         anchors.removeAll()

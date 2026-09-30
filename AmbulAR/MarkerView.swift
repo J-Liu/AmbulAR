@@ -7,10 +7,17 @@ final class MarkerView: UIView {
 
     private let circleView = UIView()
     private let label = UILabel()
+    private let distanceLabel = UILabel()
 
     var markerType: MarkerType = .start {
         didSet {
             updateAppearance()
+        }
+    }
+
+    var debugText: String = "" {
+        didSet {
+            distanceLabel.text = debugText
         }
     }
 
@@ -33,13 +40,19 @@ final class MarkerView: UIView {
         circleView.layer.borderColor = UIColor.white.cgColor
         addSubview(circleView)
 
-        label.frame = CGRect(x: 0, y: size + 4, width: size, height: 20)
+        label.frame = CGRect(x: -10, y: size + 4, width: size + 20, height: 20)
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.textColor = .white
         label.textAlignment = .center
         addSubview(label)
 
-        frame = CGRect(x: 0, y: 0, width: size, height: size + 24)
+        distanceLabel.frame = CGRect(x: -10, y: size + 24, width: size + 20, height: 16)
+        distanceLabel.font = .monospacedDigitSystemFont(ofSize: 10, weight: .medium)
+        distanceLabel.textColor = .systemYellow
+        distanceLabel.textAlignment = .center
+        addSubview(distanceLabel)
+
+        frame = CGRect(x: 0, y: 0, width: size, height: size + 40)
         updateAppearance()
     }
 
