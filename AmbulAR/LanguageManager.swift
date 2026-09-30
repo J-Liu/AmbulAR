@@ -58,8 +58,7 @@ final class LanguageManager {
         applyLanguage(currentLanguage)
     }
 
-    private func applyLanguage(_ language: AppLanguage) {
-        // iOS handles localization automatically based on user preferences
-        // The LanguageManager stores the user's language preference for manual switching
+    func applyLanguage(_ language: AppLanguage) {
+        Bundle.setLanguage(language)
     }
 }
