@@ -6,6 +6,7 @@ import UIKit
 final class SettingsViewController: UIViewController {
 
     private let tableView = UITableView(frame: .zero, style: .insetGrouped)
+    private let okButton = UIButton(type: .system)
 
     private let languages = AppLanguage.allCases
     private let units = DistanceUnit.allCases
@@ -13,6 +14,7 @@ final class SettingsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
+        setupObservers()
     }
 
     private func setupView() {
@@ -25,7 +27,6 @@ final class SettingsViewController: UIViewController {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)
 
-        let okButton = UIButton(type: .system)
         okButton.setTitle(NSLocalizedString("Done", comment: ""), for: .normal)
         okButton.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
         okButton.backgroundColor = .systemBlue
@@ -46,6 +47,21 @@ final class SettingsViewController: UIViewController {
             okButton.widthAnchor.constraint(equalToConstant: 150),
             okButton.heightAnchor.constraint(equalToConstant: 50)
         ])
+    }
+
+    private func setupObservers() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(refreshUI),
+            name: LanguageManager.languageChangedNotification,
+            object: nil
+        )
+    }
+
+    @objc private func refreshUI() {
+        title = NSLocalizedString("Settings", comment: "")
+        okButton.setTitle(NSLocalizedString("Done", comment: ""), for: .normal)
+        tableView.reloadData()
     }
 
     @objc private func dismissTapped() {
