@@ -5,14 +5,14 @@
 "Pause" = "暫停";
 "Continue" = "繼續";
 "Finish" = "結束";
-"Reset" = "重置";
+"Reset" = "重設";
 "Done" = "完成";
 
 /* Distance Units */
 "Meters" = "公尺";
 "Kilometers" = "公里";
 "Feet" = "英尺";
-"Miles" = "英里";
+"Miles" = "英哩";
 
 /* Result Screen */
 "Tracking Complete" = "追蹤完成";
