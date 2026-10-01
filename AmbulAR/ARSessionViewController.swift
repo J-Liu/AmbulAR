@@ -217,11 +217,13 @@ class ARSessionViewController: UIViewController {
             actionButton.setTitle(NSLocalizedString("Pause", comment: ""), for: .normal)
             actionButton.backgroundColor = .systemOrange
             actionButton.isHidden = false
+            finishButton.setTitle(NSLocalizedString("Finish", comment: ""), for: .normal)
             finishButton.isHidden = false
         case .paused:
             actionButton.setTitle(NSLocalizedString("Continue", comment: ""), for: .normal)
             actionButton.backgroundColor = .systemGreen
             actionButton.isHidden = false
+            finishButton.setTitle(NSLocalizedString("Finish", comment: ""), for: .normal)
             finishButton.isHidden = false
         case .finished:
             actionButton.setTitle(NSLocalizedString("Reset", comment: ""), for: .normal)
