@@ -32,11 +32,20 @@ final class AnchorManager {
                 anchor.transform.columns.3.z
             )
 
-            let projectedPoint = frame.camera.projectPoint(
-                worldPosition,
-                viewRotationAngle: 0,
-                viewportSize: view.bounds.size
-            )
+            let projectedPoint: CGPoint
+            if #available(iOS 27.0, *) {
+                projectedPoint = frame.camera.projectPoint(
+                    worldPosition,
+                    viewRotationAngle: 0,
+                    viewportSize: view.bounds.size
+                )
+            } else {
+                projectedPoint = frame.camera.projectPoint(
+                    worldPosition,
+                    orientation: .landscapeRight,
+                    viewportSize: view.bounds.size
+                )
+            }
 
             let cameraPosition = frame.camera.transform.columns.3
             let toAnchor = worldPosition - simd_float3(cameraPosition.x, cameraPosition.y, cameraPosition.z)
