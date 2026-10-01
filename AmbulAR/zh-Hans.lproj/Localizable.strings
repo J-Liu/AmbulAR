@@ -40,3 +40,6 @@
 "Simplified Chinese" = "简体中文";
 "Traditional Chinese" = "繁体中文";
 "Language changed. Restart the app to apply." = "语言已更改，重启应用以生效。";
+"Hand Preference" = "惯用手";
+"Right-handed" = "右撇子";
+"Left-handed" = "左撇子";

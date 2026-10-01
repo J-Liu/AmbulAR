@@ -72,29 +72,47 @@ final class SettingsViewController: UIViewController {
 extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
 
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        return 3
     }
 
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return section == 0 ? NSLocalizedString("Language", comment: "") : NSLocalizedString("Display Unit", comment: "")
+        switch section {
+        case 0: return NSLocalizedString("Language", comment: "")
+        case 1: return NSLocalizedString("Display Unit", comment: "")
+        case 2: return NSLocalizedString("Hand Preference", comment: "")
+        default: return nil
+        }
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return section == 0 ? languages.count : units.count
+        switch section {
+        case 0: return languages.count
+        case 1: return units.count
+        case 2: return 2
+        default: return 0
+        }
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")
             ?? UITableViewCell(style: .default, reuseIdentifier: "Cell")
 
-        if indexPath.section == 0 {
+        switch indexPath.section {
+        case 0:
             let language = languages[indexPath.row]
             cell.textLabel?.text = language.displayName
             cell.accessoryType = LanguageManager.shared.currentLanguage == language ? .checkmark : .none
-        } else {
+        case 1:
             let unit = units[indexPath.row]
             cell.textLabel?.text = unit.localizedName
             cell.accessoryType = UserDefaults.standard.string(forKey: "SelectedUnit") == unit.rawValue ? .checkmark : .none
+        case 2:
+            let isRightHanded = indexPath.row == 0
+            cell.textLabel?.text = isRightHanded ? NSLocalizedString("Right-handed", comment: "") : NSLocalizedString("Left-handed", comment: "")
+            let currentValue = UserDefaults.standard.bool(forKey: "RightHanded") != false
+            cell.accessoryType = currentValue == isRightHanded ? .checkmark : .none
+        default:
+            break
         }
 
         return cell
@@ -103,13 +121,20 @@ extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
 
-        if indexPath.section == 0 {
+        switch indexPath.section {
+        case 0:
             let selectedLanguage = languages[indexPath.row]
             LanguageManager.shared.currentLanguage = selectedLanguage
-        } else {
+        case 1:
             let selectedUnit = units[indexPath.row]
             UserDefaults.standard.set(selectedUnit.rawValue, forKey: "SelectedUnit")
             NotificationCenter.default.post(name: .unitChanged, object: nil)
+        case 2:
+            let isRightHanded = indexPath.row == 0
+            UserDefaults.standard.set(isRightHanded, forKey: "RightHanded")
+            NotificationCenter.default.post(name: .handPreferenceChanged, object: nil)
+        default:
+            break
         }
 
         tableView.reloadData()
@@ -118,4 +143,5 @@ extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
 
 extension Notification.Name {
     static let unitChanged = Notification.Name("UnitChangedNotification")
+    static let handPreferenceChanged = Notification.Name("HandPreferenceChangedNotification")
 }

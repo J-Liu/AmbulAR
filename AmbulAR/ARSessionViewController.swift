@@ -19,6 +19,7 @@ class ARSessionViewController: UIViewController {
     private let qualityLabel = UILabel()
 
     private var currentPosition: simd_float3?
+    private var finishButtonHorizontalConstraint: NSLayoutConstraint?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,11 +33,13 @@ class ARSessionViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         arView.session.run(configuration)
+        UIApplication.shared.isIdleTimerDisabled = true
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         arView.session.pause()
+        UIApplication.shared.isIdleTimerDisabled = false
     }
 
     private func setupARView() {
@@ -77,6 +80,8 @@ class ARSessionViewController: UIViewController {
         finishButton.isHidden = true
         view.addSubview(finishButton)
 
+        updateFinishButtonPosition()
+
         settingsButton.setImage(UIImage(systemName: "gear"), for: .normal)
         settingsButton.tintColor = .white
         settingsButton.addTarget(self, action: #selector(showSettings), for: .touchUpInside)
@@ -109,11 +114,22 @@ class ARSessionViewController: UIViewController {
             actionButton.widthAnchor.constraint(equalToConstant: 120),
             actionButton.heightAnchor.constraint(equalToConstant: 50),
 
-            finishButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             finishButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -30),
             finishButton.widthAnchor.constraint(equalToConstant: 100),
             finishButton.heightAnchor.constraint(equalToConstant: 50)
         ])
+    }
+
+    private func updateFinishButtonPosition() {
+        finishButtonHorizontalConstraint?.isActive = false
+
+        let isRightHanded = UserDefaults.standard.bool(forKey: "RightHanded") != false
+        if isRightHanded {
+            finishButtonHorizontalConstraint = finishButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
+        } else {
+            finishButtonHorizontalConstraint = finishButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20)
+        }
+        finishButtonHorizontalConstraint?.isActive = true
     }
 
     private func setupObservers() {
@@ -129,6 +145,16 @@ class ARSessionViewController: UIViewController {
             name: .unitChanged,
             object: nil
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handPreferenceChanged),
+            name: .handPreferenceChanged,
+            object: nil
+        )
+    }
+
+    @objc private func handPreferenceChanged() {
+        updateFinishButtonPosition()
     }
 
     @objc private func updateLocalizedStrings() {
