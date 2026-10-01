@@ -12,7 +12,9 @@ final class LanguageBundle: Bundle, @unchecked Sendable {
               let bundle = Bundle(path: path) else {
             return super.localizedString(forKey: key, value: value, table: tableName)
         }
-        return bundle.localizedString(forKey: key, value: value, table: tableName)
+        let result = bundle.localizedString(forKey: key, value: value, table: tableName)
+        print("[Language] Key: '\(key)' -> '\(result)' (bundle: \(path))")
+        return result
     }
 }
 
@@ -42,11 +44,9 @@ extension Bundle {
 
         if let path = bundlePath {
             objc_setAssociatedObject(Bundle.main, &bundleKey, path, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-            print("[Language] Set to \(language.rawValue), path: \(path)")
         } else {
             let fallback = Bundle.main.path(forResource: "en", ofType: "lproj") ?? ""
             objc_setAssociatedObject(Bundle.main, &bundleKey, fallback, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-            print("[Language] Fallback to en, path: \(fallback)")
         }
     }
 }
