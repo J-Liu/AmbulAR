@@ -72,7 +72,7 @@ final class SettingsViewController: UIViewController {
 extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
 
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 3
+        return 4
     }
 
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -89,6 +89,7 @@ extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
         case 0: return languages.count
         case 1: return units.count
         case 2: return 2
+        case 3: return 1
         default: return 0
         }
     }
@@ -111,6 +112,9 @@ extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
             cell.textLabel?.text = isRightHanded ? NSLocalizedString("Right-handed", comment: "") : NSLocalizedString("Left-handed", comment: "")
             let currentValue = UserDefaults.standard.bool(forKey: "RightHanded") != false
             cell.accessoryType = currentValue == isRightHanded ? .checkmark : .none
+        case 3:
+            cell.textLabel?.text = NSLocalizedString("About", comment: "")
+            cell.accessoryType = .disclosureIndicator
         default:
             break
         }
@@ -133,6 +137,8 @@ extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
             let isRightHanded = indexPath.row == 0
             UserDefaults.standard.set(isRightHanded, forKey: "RightHanded")
             NotificationCenter.default.post(name: .handPreferenceChanged, object: nil)
+        case 3:
+            navigationController?.pushViewController(AboutViewController(), animated: true)
         default:
             break
         }
