@@ -18,7 +18,7 @@ final class LanguageBundle: Bundle, @unchecked Sendable {
 
 extension Bundle {
     static func setLanguage(_ language: AppLanguage) {
-        let bundlePath: String?
+        var bundlePath: String?
 
         switch language {
         case .system:
@@ -35,15 +35,23 @@ extension Bundle {
 
         if let path = bundlePath {
             objc_setAssociatedObject(Bundle.main, &bundleKey, path, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            print("[Language] Set language to: \(language.rawValue), path: \(path)")
         } else {
             let preferredLanguage = Locale.preferredLanguages.first ?? "en"
+            var path: String
             if preferredLanguage.hasPrefix("zh-Hant") {
-                objc_setAssociatedObject(Bundle.main, &bundleKey, Bundle.main.path(forResource: "zh-Hant", ofType: "lproj") ?? "", .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-            } else if preferredLanguage.hasPrefix("zh-Hans") || preferredLanguage.hasPrefix("zh-CN") {
-                objc_setAssociatedObject(Bundle.main, &bundleKey, Bundle.main.path(forResource: "zh-Hans", ofType: "lproj") ?? "", .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+                path = Bundle.main.path(forResource: "zh-Hant", ofType: "lproj") ?? Bundle.main.path(forResource: "en", ofType: "lproj")!
+            } else if preferredLanguage.hasPrefix("zh-Hans") || preferredLanguage.hasPrefix("zh-CN") || preferredLanguage.hasPrefix("zh") {
+                path = Bundle.main.path(forResource: "zh-Hans", ofType: "lproj") ?? Bundle.main.path(forResource: "en", ofType: "lproj")!
             } else {
-                objc_setAssociatedObject(Bundle.main, &bundleKey, Bundle.main.path(forResource: "en", ofType: "lproj") ?? "", .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+                path = Bundle.main.path(forResource: "en", ofType: "lproj")!
             }
+            objc_setAssociatedObject(Bundle.main, &bundleKey, path, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            print("[Language] Set system language, detected: \(preferredLanguage), path: \(path)")
         }
+
+        let testKey = "Finish"
+        let testResult = Bundle.main.localizedString(forKey: testKey, value: nil, table: nil)
+        print("[Language] Test '\(testKey)' = '\(testResult)'")
     }
 }
