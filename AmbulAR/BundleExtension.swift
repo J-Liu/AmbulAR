@@ -18,11 +18,20 @@ final class LanguageBundle: Bundle, @unchecked Sendable {
 
 extension Bundle {
     static func setLanguage(_ language: AppLanguage) {
-        var bundlePath: String?
+        object_setClass(Bundle.main, LanguageBundle.self)
 
+        let bundlePath: String?
+        
         switch language {
         case .system:
-            bundlePath = nil
+            let preferredLanguage = Locale.preferredLanguages.first ?? "en"
+            if preferredLanguage.hasPrefix("zh-Hant") {
+                bundlePath = Bundle.main.path(forResource: "zh-Hant", ofType: "lproj")
+            } else if preferredLanguage.hasPrefix("zh-Hans") || preferredLanguage.hasPrefix("zh-CN") || preferredLanguage.hasPrefix("zh") {
+                bundlePath = Bundle.main.path(forResource: "zh-Hans", ofType: "lproj")
+            } else {
+                bundlePath = Bundle.main.path(forResource: "en", ofType: "lproj")
+            }
         case .english:
             bundlePath = Bundle.main.path(forResource: "en", ofType: "lproj")
         case .simplifiedChinese:
@@ -31,27 +40,13 @@ extension Bundle {
             bundlePath = Bundle.main.path(forResource: "zh-Hant", ofType: "lproj")
         }
 
-        object_setClass(Bundle.main, LanguageBundle.self)
-
         if let path = bundlePath {
             objc_setAssociatedObject(Bundle.main, &bundleKey, path, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-            print("[Language] Set language to: \(language.rawValue), path: \(path)")
+            print("[Language] Set to \(language.rawValue), path: \(path)")
         } else {
-            let preferredLanguage = Locale.preferredLanguages.first ?? "en"
-            var path: String
-            if preferredLanguage.hasPrefix("zh-Hant") {
-                path = Bundle.main.path(forResource: "zh-Hant", ofType: "lproj") ?? Bundle.main.path(forResource: "en", ofType: "lproj")!
-            } else if preferredLanguage.hasPrefix("zh-Hans") || preferredLanguage.hasPrefix("zh-CN") || preferredLanguage.hasPrefix("zh") {
-                path = Bundle.main.path(forResource: "zh-Hans", ofType: "lproj") ?? Bundle.main.path(forResource: "en", ofType: "lproj")!
-            } else {
-                path = Bundle.main.path(forResource: "en", ofType: "lproj")!
-            }
-            objc_setAssociatedObject(Bundle.main, &bundleKey, path, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-            print("[Language] Set system language, detected: \(preferredLanguage), path: \(path)")
+            let fallback = Bundle.main.path(forResource: "en", ofType: "lproj") ?? ""
+            objc_setAssociatedObject(Bundle.main, &bundleKey, fallback, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            print("[Language] Fallback to en, path: \(fallback)")
         }
-
-        let testKey = "Finish"
-        let testResult = Bundle.main.localizedString(forKey: testKey, value: nil, table: nil)
-        print("[Language] Test '\(testKey)' = '\(testResult)'")
     }
 }
