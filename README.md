@@ -8,13 +8,15 @@ A native iOS AR distance tracking app using ARKit and CoreMotion.
 - **CoreMotion Auxiliary Support**: CMPedometer integration for motion detection and fallback when AR tracking is limited
 - **Real-time AR Anchors**: Visual markers placed at key points (start, pause, resume, finish) in augmented reality
 - **Tracking Quality Monitoring**: Automatic detection and user feedback for tracking quality issues
-- **Unit Conversion**: Display distance in meters, kilometers, or feet
+- **Unit Conversion**: Display distance in meters, kilometers, feet, or miles
+- **Multi-language Support**: English, Simplified Chinese, and Traditional Chinese with in-app switching
+- **Hand Preference**: Configurable finish button position for left-handed or right-handed users
 - **Pure UIKit Implementation**: No SwiftUI or Storyboards, fully programmatic UI
 
 ## Requirements
 
-- iOS 17.0 or later
-- Xcode 15.0 or later
+- iOS 18.0 or later
+- Xcode 16.0 or later
 - ARKit compatible device (iOS device with A9 chip or later)
 
 ## Architecture
@@ -53,7 +55,14 @@ AmbulAR/
 5. Tap "Pause" to temporarily stop tracking
 6. Tap "Continue" to resume from your current position
 7. Tap "Finish" to complete the session and view your total distance
-8. Switch between meters, kilometers, and feet using the segmented control
+
+## Settings
+
+Access settings via the gear icon in the top-right corner:
+
+- **Language**: Choose between System Default, English, Simplified Chinese, or Traditional Chinese
+- **Display Unit**: Meters, Kilometers, Feet, or Miles
+- **Hand Preference**: Right-handed (Finish button on right) or Left-handed (Finish button on left)
 
 ## Privacy
 
