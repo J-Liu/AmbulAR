@@ -123,7 +123,7 @@ class ARSessionViewController: UIViewController {
     private func updateFinishButtonPosition() {
         finishButtonHorizontalConstraint?.isActive = false
 
-        let isRightHanded = UserDefaults.standard.bool(forKey: "RightHanded") != false
+        let isRightHanded = UserDefaults.standard.object(forKey: "RightHanded") as? Bool ?? true
         if isRightHanded {
             finishButtonHorizontalConstraint = finishButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
         } else {

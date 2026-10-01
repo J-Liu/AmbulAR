@@ -110,7 +110,7 @@ extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
         case 2:
             let isRightHanded = indexPath.row == 0
             cell.textLabel?.text = isRightHanded ? NSLocalizedString("Right-handed", comment: "") : NSLocalizedString("Left-handed", comment: "")
-            let currentValue = UserDefaults.standard.bool(forKey: "RightHanded") != false
+            let currentValue = UserDefaults.standard.object(forKey: "RightHanded") as? Bool ?? true
             cell.accessoryType = currentValue == isRightHanded ? .checkmark : .none
         case 3:
             cell.textLabel?.text = NSLocalizedString("About", comment: "")
