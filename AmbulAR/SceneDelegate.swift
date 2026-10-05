@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2026 Jia Liu
+// Licensed under AGPL-3.0-or-later with an additional permission
+// under Section 7. See LICENSE for details.
 
 import UIKit
 
@@ -10,9 +12,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
-        
+
         _ = LanguageManager.shared
-        
+
         window = UIWindow(windowScene: windowScene)
         window?.rootViewController = ARSessionViewController()
         window?.makeKeyAndVisible()
