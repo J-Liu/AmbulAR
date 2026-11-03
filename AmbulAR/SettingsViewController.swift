@@ -91,7 +91,7 @@ extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")
-            ?? UITableViewCell(style: .default, reuseIdentifier: "Cell")
+            ?? UITableViewCell(style: .value1, reuseIdentifier: "Cell")
 
         switch indexPath.section {
         case 0:
@@ -112,7 +112,9 @@ extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
             let currentValue = UserDefaults.standard.object(forKey: "RightHanded") as? Bool ?? true
             cell.accessoryType = currentValue == isRightHanded ? .checkmark : .none
         case 4:
+            let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
             cell.textLabel?.text = NSLocalizedString("About", comment: "")
+            cell.detailTextLabel?.text = version
             cell.accessoryType = .disclosureIndicator
         default:
             break
