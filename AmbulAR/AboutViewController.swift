@@ -16,6 +16,15 @@ final class AboutViewController: UIViewController {
         return label
     }()
 
+    private let versionLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 15, weight: .regular)
+        label.textColor = .secondaryLabel
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
     private let linkButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("github.com/J-Liu/AmbulAR", for: .normal)
@@ -45,8 +54,13 @@ final class AboutViewController: UIViewController {
         view.backgroundColor = .systemBackground
 
         view.addSubview(titleLabel)
+        view.addSubview(versionLabel)
         view.addSubview(linkButton)
         view.addSubview(copyrightLabel)
+
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
+        versionLabel.text = "\(NSLocalizedString("Version", comment: "")) \(version) (\(build))"
 
         linkButton.addTarget(self, action: #selector(openLink), for: .touchUpInside)
 
@@ -54,7 +68,10 @@ final class AboutViewController: UIViewController {
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 60),
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
 
-            linkButton.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 20),
+            versionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
+            versionLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+
+            linkButton.topAnchor.constraint(equalTo: versionLabel.bottomAnchor, constant: 20),
             linkButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
 
             copyrightLabel.topAnchor.constraint(equalTo: linkButton.bottomAnchor, constant: 30),
