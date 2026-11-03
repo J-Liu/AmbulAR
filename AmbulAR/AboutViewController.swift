@@ -7,6 +7,16 @@ import UIKit
 
 final class AboutViewController: UIViewController {
 
+    private let iconImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "AboutIcon")
+        imageView.contentMode = .scaleAspectFit
+        imageView.layer.cornerRadius = 22
+        imageView.clipsToBounds = true
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 28, weight: .bold)
@@ -53,6 +63,7 @@ final class AboutViewController: UIViewController {
         title = NSLocalizedString("About", comment: "")
         view.backgroundColor = .systemBackground
 
+        view.addSubview(iconImageView)
         view.addSubview(titleLabel)
         view.addSubview(versionLabel)
         view.addSubview(linkButton)
@@ -65,7 +76,12 @@ final class AboutViewController: UIViewController {
         linkButton.addTarget(self, action: #selector(openLink), for: .touchUpInside)
 
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 60),
+            iconImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40),
+            iconImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            iconImageView.widthAnchor.constraint(equalToConstant: 120),
+            iconImageView.heightAnchor.constraint(equalToConstant: 120),
+
+            titleLabel.topAnchor.constraint(equalTo: iconImageView.bottomAnchor, constant: 16),
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
 
             versionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
