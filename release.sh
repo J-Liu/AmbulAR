@@ -10,7 +10,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-echo -e "${GREEN}=== Lunapeek iOS Release Script ===${NC}\n"
+echo -e "${GREEN}=== AmbulAR iOS Release Script ===${NC}\n"
 
 # Check if we're on main branch
 CURRENT_BRANCH=$(git branch --show-current)
@@ -82,7 +82,7 @@ NEW_VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}"
 echo -e "${GREEN}New tag: ${NEW_TAG}${NC}"
 
 # Get current version from xcodeproj
-PROJECT_FILE="Lunapeek.xcodeproj/project.pbxproj"
+PROJECT_FILE="AmbulAR.xcodeproj/project.pbxproj"
 if [ ! -f "$PROJECT_FILE" ]; then
     echo -e "${RED}Error: project.pbxproj not found${NC}"
     exit 1
@@ -138,4 +138,4 @@ echo -e "${GREEN}Pushing to origin...${NC}"
 git push origin main
 git push origin "$NEW_TAG"
 
-echo -e "\n${GREEN}=== Lunapeek Release $NEW_TAG completed! ===${NC}"
+echo -e "\n${GREEN}=== AmbulAR Release $NEW_TAG completed! ===${NC}"
