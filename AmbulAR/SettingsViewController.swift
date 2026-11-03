@@ -8,7 +8,6 @@ import UIKit
 final class SettingsViewController: UIViewController {
 
     private let tableView = UITableView(frame: .zero, style: .insetGrouped)
-    private let okButton = UIButton(type: .system)
 
     private let themes = AppTheme.allCases
     private let languages = AppLanguage.allCases
@@ -24,31 +23,20 @@ final class SettingsViewController: UIViewController {
         title = NSLocalizedString("Settings", comment: "")
         navigationController?.navigationBar.prefersLargeTitles = false
 
+        let doneButton = UIBarButtonItem(image: UIImage(systemName: "checkmark.circle"), style: .plain, target: self, action: #selector(dismissTapped))
+        navigationItem.rightBarButtonItem = doneButton
+
         view.backgroundColor = .systemBackground
         tableView.dataSource = self
         tableView.delegate = self
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)
 
-        okButton.setTitle(NSLocalizedString("Done", comment: ""), for: .normal)
-        okButton.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
-        okButton.backgroundColor = .systemBlue
-        okButton.setTitleColor(.white, for: .normal)
-        okButton.layer.cornerRadius = 12
-        okButton.addTarget(self, action: #selector(dismissTapped), for: .touchUpInside)
-        okButton.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(okButton)
-
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-
-            okButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            okButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
-            okButton.widthAnchor.constraint(equalToConstant: 150),
-            okButton.heightAnchor.constraint(equalToConstant: 50)
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
 
@@ -63,7 +51,6 @@ final class SettingsViewController: UIViewController {
 
     @objc private func refreshUI() {
         title = NSLocalizedString("Settings", comment: "")
-        okButton.setTitle(NSLocalizedString("Done", comment: ""), for: .normal)
         tableView.reloadData()
     }
 
