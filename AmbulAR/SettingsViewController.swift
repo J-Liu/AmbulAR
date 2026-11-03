@@ -10,6 +10,7 @@ final class SettingsViewController: UIViewController {
     private let tableView = UITableView(frame: .zero, style: .insetGrouped)
     private let okButton = UIButton(type: .system)
 
+    private let themes = AppTheme.allCases
     private let languages = AppLanguage.allCases
     private let units = DistanceUnit.allCases
 
@@ -74,24 +75,26 @@ final class SettingsViewController: UIViewController {
 extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
 
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 4
+        return 5
     }
 
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch section {
-        case 0: return NSLocalizedString("Language", comment: "")
-        case 1: return NSLocalizedString("Display Unit", comment: "")
-        case 2: return NSLocalizedString("Hand Preference", comment: "")
+        case 0: return NSLocalizedString("Theme", comment: "")
+        case 1: return NSLocalizedString("Language", comment: "")
+        case 2: return NSLocalizedString("Display Unit", comment: "")
+        case 3: return NSLocalizedString("Hand Preference", comment: "")
         default: return nil
         }
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
-        case 0: return languages.count
-        case 1: return units.count
-        case 2: return 2
-        case 3: return 1
+        case 0: return themes.count
+        case 1: return languages.count
+        case 2: return units.count
+        case 3: return 2
+        case 4: return 1
         default: return 0
         }
     }
@@ -102,19 +105,23 @@ extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
 
         switch indexPath.section {
         case 0:
+            let theme = themes[indexPath.row]
+            cell.textLabel?.text = theme.localizedName
+            cell.accessoryType = AppTheme.current == theme ? .checkmark : .none
+        case 1:
             let language = languages[indexPath.row]
             cell.textLabel?.text = language.displayName
             cell.accessoryType = LanguageManager.shared.currentLanguage == language ? .checkmark : .none
-        case 1:
+        case 2:
             let unit = units[indexPath.row]
             cell.textLabel?.text = unit.localizedName
             cell.accessoryType = UserDefaults.standard.string(forKey: "SelectedUnit") == unit.rawValue ? .checkmark : .none
-        case 2:
+        case 3:
             let isRightHanded = indexPath.row == 0
             cell.textLabel?.text = isRightHanded ? NSLocalizedString("Right-handed", comment: "") : NSLocalizedString("Left-handed", comment: "")
             let currentValue = UserDefaults.standard.object(forKey: "RightHanded") as? Bool ?? true
             cell.accessoryType = currentValue == isRightHanded ? .checkmark : .none
-        case 3:
+        case 4:
             cell.textLabel?.text = NSLocalizedString("About", comment: "")
             cell.accessoryType = .disclosureIndicator
         default:
@@ -129,17 +136,20 @@ extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
 
         switch indexPath.section {
         case 0:
+            let selectedTheme = themes[indexPath.row]
+            selectedTheme.apply()
+        case 1:
             let selectedLanguage = languages[indexPath.row]
             LanguageManager.shared.currentLanguage = selectedLanguage
-        case 1:
+        case 2:
             let selectedUnit = units[indexPath.row]
             UserDefaults.standard.set(selectedUnit.rawValue, forKey: "SelectedUnit")
             NotificationCenter.default.post(name: .unitChanged, object: nil)
-        case 2:
+        case 3:
             let isRightHanded = indexPath.row == 0
             UserDefaults.standard.set(isRightHanded, forKey: "RightHanded")
             NotificationCenter.default.post(name: .handPreferenceChanged, object: nil)
-        case 3:
+        case 4:
             navigationController?.pushViewController(AboutViewController(), animated: true)
         default:
             break

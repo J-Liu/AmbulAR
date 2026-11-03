@@ -21,8 +21,6 @@ final class AnchorManager {
         view.markerType = type
         anchors.append((anchor, type, view, position))
 
-        print("[AnchorManager] Created \(type) anchor at position: (\(String(format: "%.3f", position.x)), \(String(format: "%.3f", position.y)), \(String(format: "%.3f", position.z)))")
-
         return anchor
     }
 

@@ -34,6 +34,9 @@
 
 /* Settings */
 "Settings" = "Settings";
+"Theme" = "Theme";
+"Light" = "Light";
+"Dark" = "Dark";
 "Language" = "Language";
 "System Default" = "System Default";
 "English" = "English";

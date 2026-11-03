@@ -34,6 +34,9 @@
 
 /* Settings */
 "Settings" = "設定";
+"Theme" = "主題";
+"Light" = "淺色";
+"Dark" = "深色";
 "Language" = "語言";
 "System Default" = "跟隨系統";
 "English" = "英文";

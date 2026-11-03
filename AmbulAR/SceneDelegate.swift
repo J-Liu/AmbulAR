@@ -17,6 +17,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         window = UIWindow(windowScene: windowScene)
         window?.rootViewController = ARSessionViewController()
+        window?.overrideUserInterfaceStyle = AppTheme.current.userInterfaceStyle
         window?.makeKeyAndVisible()
     }
 
