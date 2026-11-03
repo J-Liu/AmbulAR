@@ -23,8 +23,11 @@ final class SettingsViewController: UIViewController {
         title = NSLocalizedString("Settings", comment: "")
         navigationController?.navigationBar.prefersLargeTitles = false
 
-        let doneButton = UIBarButtonItem(image: UIImage(systemName: "checkmark.circle.fill"), style: .plain, target: self, action: #selector(dismissTapped))
-        navigationItem.rightBarButtonItem = doneButton
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            barButtonSystemItem: .done,
+            target: self,
+            action: #selector(dismissTapped)
+        )
 
         view.backgroundColor = .systemBackground
         tableView.dataSource = self
