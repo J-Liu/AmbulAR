@@ -138,6 +138,8 @@ extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")
             ?? UITableViewCell(style: .value1, reuseIdentifier: "Cell")
 
+        cell.detailTextLabel?.text = nil
+
         switch indexPath.section {
         case 0:
             let theme = themes[indexPath.row]

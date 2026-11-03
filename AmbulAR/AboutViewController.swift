@@ -49,7 +49,6 @@ final class AboutViewController: UIViewController {
         label.textColor = .secondaryLabel
         label.textAlignment = .center
         label.numberOfLines = 0
-        label.text = "Copyright 2026 Jia Liu. All rights reserved."
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -72,6 +71,7 @@ final class AboutViewController: UIViewController {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
         versionLabel.text = "\(NSLocalizedString("Version", comment: "")) \(version) (\(build))"
+        copyrightLabel.text = NSLocalizedString("Copyright 2026 Jia Liu. All rights reserved.", comment: "")
 
         linkButton.addTarget(self, action: #selector(openLink), for: .touchUpInside)
 
