@@ -60,6 +60,51 @@ final class SettingsViewController: UIViewController {
     @objc private func dismissTapped() {
         dismiss(animated: true)
     }
+
+    private func showLicense() {
+        let vc = UIViewController()
+        vc.title = NSLocalizedString("License", comment: "")
+        vc.view.backgroundColor = .systemBackground
+
+        let textView = UITextView()
+        textView.font = .monospacedSystemFont(ofSize: 11, weight: .regular)
+        textView.isEditable = false
+        textView.isSelectable = true
+        textView.dataDetectorTypes = .link
+        textView.translatesAutoresizingMaskIntoConstraints = false
+        vc.view.addSubview(textView)
+
+        let licenseSummary = """
+        GNU AFFERO GENERAL PUBLIC LICENSE
+        Version 3, 19 November 2007
+
+        Copyright (C) 2007 Free Software Foundation, Inc.
+
+        Additional Permission under Section 7
+
+        As an additional permission under section 7, you are allowed to distribute
+        the software through an app store, even if that store has restrictive terms
+        and conditions that are incompatible with the AGPL, provided that the source
+        is also available under the AGPL with or without this permission through a
+        channel without those restrictive terms and conditions.
+
+        Copyright (C) 2026 Jia Liu
+
+        Full license text:
+        https://github.com/J-Liu/AmbulAR/blob/main/LICENSE
+        """
+
+        textView.text = licenseSummary
+
+        NSLayoutConstraint.activate([
+            textView.topAnchor.constraint(equalTo: vc.view.safeAreaLayoutGuide.topAnchor),
+            textView.leadingAnchor.constraint(equalTo: vc.view.leadingAnchor, constant: 16),
+            textView.trailingAnchor.constraint(equalTo: vc.view.trailingAnchor, constant: -16),
+            textView.bottomAnchor.constraint(equalTo: vc.view.bottomAnchor)
+        ])
+
+        navigationController?.pushViewController(vc, animated: true)
+    }
 }
 
 extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
@@ -84,7 +129,7 @@ extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
         case 1: return languages.count
         case 2: return units.count
         case 3: return 2
-        case 4: return 1
+        case 4: return 2
         default: return 0
         }
     }
@@ -112,10 +157,16 @@ extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
             let currentValue = UserDefaults.standard.object(forKey: "RightHanded") as? Bool ?? true
             cell.accessoryType = currentValue == isRightHanded ? .checkmark : .none
         case 4:
-            let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
-            cell.textLabel?.text = NSLocalizedString("About", comment: "")
-            cell.detailTextLabel?.text = version
-            cell.accessoryType = .disclosureIndicator
+            if indexPath.row == 0 {
+                let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+                cell.textLabel?.text = NSLocalizedString("About", comment: "")
+                cell.detailTextLabel?.text = version
+                cell.accessoryType = .disclosureIndicator
+            } else {
+                cell.textLabel?.text = NSLocalizedString("License", comment: "")
+                cell.detailTextLabel?.text = "AGPL-3.0"
+                cell.accessoryType = .disclosureIndicator
+            }
         default:
             break
         }
@@ -142,7 +193,11 @@ extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
             UserDefaults.standard.set(isRightHanded, forKey: "RightHanded")
             NotificationCenter.default.post(name: .handPreferenceChanged, object: nil)
         case 4:
-            navigationController?.pushViewController(AboutViewController(), animated: true)
+            if indexPath.row == 0 {
+                navigationController?.pushViewController(AboutViewController(), animated: true)
+            } else {
+                showLicense()
+            }
         default:
             break
         }
